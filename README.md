@@ -11,13 +11,12 @@ components:nslookup, nmap, whatweb, custom sub domain list, custom directory lis
 
 how to start: 
 
-
 git clone https://github.com/VHJ5TmV0/SWOT.git
+
+sudo su
 
 mv SWOT /var/www/html/
 
 cd /var/www/html/SWOT
-
-sudo su
 
 service apache2 start and open in browser thiss adress http://127.0.0.1/SWOT

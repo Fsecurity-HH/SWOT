@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-color: black; /* Серый фон */
+            background-color: black; 
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -33,7 +33,7 @@
             text-align: center;
         }
         input[type="text"] {
-            width: calc(100% - 20px); /* Смещение влево на 20px */
+            width: calc(100% - 20px);
             padding: 8px;
             box-sizing: border-box;
             margin-left: 10px;

@@ -19,4 +19,6 @@ mv SWOT /var/www/html/
 
 cd /var/www/html/SWOT
 
-service apache2 start and open in browser thiss adress http://127.0.0.1/SWOT
+service apache2 start
+
+open in browser this adress http://127.0.0.1/SWOT

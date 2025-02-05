@@ -16,7 +16,7 @@ git clone https://github.com/VHJ5TmV0/SWOT.git
 
 mv SWOT /var/www/html/
 
-cd /SWOT
+cd /var/www/html/SWOT
 
 sudo su
 

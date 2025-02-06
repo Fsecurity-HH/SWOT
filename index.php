@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-color: black; 
+            background-color: black;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -33,7 +33,7 @@
             text-align: center;
         }
         input[type="text"] {
-            width: calc(100% - 20px);
+            width: calc(100% - 20px); 
             padding: 8px;
             box-sizing: border-box;
             margin-left: 10px;
@@ -610,7 +610,72 @@ $subdomains = [
     </div>
 </div>
 
-    
+<div class="container">
+    <div class="card">
+        <h2 style="color:black;" >WAF Detection</h2>
+       
+        <form method="POST" action="">
+            <div class="form-group">
+                <label style="color:black;" for="waf_url">Enter URL or IP:</label>
+                <input type="text" id="waf_url" name="waf_url" placeholder="https://example.com" required>
+            </div>
+            <div class="buttons-container">
+                <button type="submit" name="waf_check" class="waf-button">Start Scan</button>
+            </div>
+        </form>
+        
+        <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['waf_check'])): ?>
+            <div class="results" id="waf_results">
+                <button class="copy-button" onclick="copyWafResults()">Copy to Clipboard</button>
+                <h2>WAF Check Results:</h2>
+                <?php
+              
+                $url = escapeshellarg($_POST['waf_url']); 
+
+                echo "<h3>Checking for WAF on {$url}</h3>";
+
+               
+                $wafw00f_path = shell_exec('which wafw00f');
+                if (empty(trim($wafw00f_path))) {
+                    echo "<p>Error: wafw00f is not installed or not accessible.</p>";
+                } else {
+                    
+                    $command = "wafw00f {$url} 2>&1"; 
+                    $output = shell_exec($command);
+
+                    if ($output) {
+                       
+                        $filtered_output = '';
+                        $lines = explode("\n", $output); 
+                        foreach ($lines as $line) {
+                           
+                            if (
+                                preg_match('/^\[.*\]/', $line) || 
+                                preg_match('/^[-+].*:/i', $line) || 
+                                preg_match('/^Number of requests: \d+/', $line) 
+                            ) {
+                                $filtered_output .= trim($line) . "\n"; 
+                            }
+                        }
+
+                        if (!empty($filtered_output)) {
+                            echo "<pre>" . htmlspecialchars(trim($filtered_output)) . "</pre>";
+                        } else {
+                            echo "<p>No technical information found in the output.</p>";
+                        }
+                    } else {
+                        echo "<p>Error: Unable to execute wafw00f or no results found.</p>";
+                    }
+
+                    
+                    error_log("Command executed: $command");
+                    error_log("Output: $output");
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
     
     <script>
         function copyToClipboard() {
@@ -661,6 +726,15 @@ $subdomains = [
             console.error('Не удалось скопировать текст: ', err);
         });
     }
+        
+            function copyWafResults() {
+        var results = document.getElementById('waf_results').innerText;
+        navigator.clipboard.writeText(results).then(function() {
+        }, function(err) {
+            console.error('Не удалось скопировать текст: ', err);
+        });
+    }
+        
         
     </script>
 </body>

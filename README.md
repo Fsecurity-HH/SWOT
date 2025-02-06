@@ -7,7 +7,7 @@ Kali
 Ubuntu
 Parrot security os
 
-components:nslookup, nmap, whatweb, custom sub domain list, custom directory list,
+components: nslookup, nmap, whatweb, custom sub domain list, custom directory list, wafw00f
 
 how to start: 
 

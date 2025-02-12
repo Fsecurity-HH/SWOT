@@ -5,24 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Web Osint Tool</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: black;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        .container {
-            max-width: 500px;
-            margin: 0 20px;
-            padding: 20px;
-            background-color: grey; 
-            border: 2px solid white;
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: black;
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap; 
+    max-width: 1200px; 
+    margin: 40px;
+    margin-top:60px;
+    background-color:gray;
+            border: 20px solid grey;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            margin-top: 60px;
-        }
+    justify-content: center;
+}
         .form-group {
             margin-bottom: 15px;
         }
@@ -78,14 +82,13 @@
             background-color: #902537;
             border-radius: 10px;
         }
-        .card {
-            background-color: #f4f4f4;
-            padding: 20px;
-            border-radius: 10px;
-            width: 100%;
-            box-sizing: border-box;
-            position: relative;
-        }
+.card {
+    background-color: #f4f4f4;
+    padding: 20px;
+    width: 350px; 
+    box-sizing: border-box;
+    position: relative;
+}
         .card h2 {
             margin-bottom: 15px;
             color: white;
@@ -114,11 +117,7 @@
         .wayback-button:hover {
             background-color: #902537;
         }
-        
-        .hr{
-        
-        }
-        
+
     </style>
 </head>
 <body>
@@ -542,7 +541,7 @@ $subdomains = [
                 
                 $domain = $_POST['directory_domain'];
 
-                echo "<h2>Checking directories on {$domain}</h2>";
+echo "<h2 style='color: black;'>Поиск Директорий на {$domain}</h2>";
 
                 
                 foreach ($subdirectories as $directory) {
@@ -677,6 +676,345 @@ $subdomains = [
     </div>
 </div>
     
+
+<div class="container">
+    <div class="card">
+        <h2 style="color:black;">API Endpoint Finder</h2>
+        
+        <form method="POST" action="">
+            <div class="form-group">
+                <label style="color:black;" for="api_domain">Enter Domain:</label>
+                <input type="text" id="api_domain" name="api_domain" placeholder="https://example.com" required>
+            </div>
+            <div class="buttons-container">
+                <button type="submit" name="api_check" class="api-button">Start Scan</button>
+            </div>
+        </form>
+       
+        <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['api_check'])): ?>
+            <div class="results" id="api_results">
+                <button class="copy-button" onclick="copyApiResults()">Copy to Clipboard</button>
+                <h2 style="color:black;">API Endpoint Check Results:</h2>
+                <?php
+                
+                
+                $api_endpoints = [
+                       "/api",
+    "/api/v1",
+    "/api/v2",
+    "/api/v3",
+    "/graphql",
+    "/graphql/v1",
+    "/graphql/v2",
+    "/graphql/schema",
+    "/graphql/playground",
+    "/graphql/query",
+    "/rest",
+    "/rest/v1",
+    "/rest/v2",
+    "/rest/v3",
+    "/rest/auth",
+    "/rest/users",
+    "/rest/posts",
+    "/rest/orders",
+    "/rest/products",
+    "/rest/settings",
+    "/rest/system",
+    "/wp-json",
+    "/wp-json/wp/v1",
+    "/wp-json/wp/v2",
+    "/wp-json/wp/v3",
+    "/wp-json/oembed",
+    "/wp-json/jwt-auth/v1/token",
+    "/wp-json/contact-form-7/v1",
+    "/wp-json/wc/v3",
+    "/wp-json/wc/v2",
+    "/wp-json/acf/v3",
+    "/wp-json/yoast/v1",
+    "/wp-json/wpml/v1",
+    "/wp-json/litespeed/v1",
+    "/joomla/api",
+    "/joomla/rest",
+    "/joomla/v1",
+    "/joomla/v2",
+    "/joomla/users",
+    "/joomla/articles",
+    "/joomla/categories",
+    "/joomla/contacts",
+    "/joomla/tags",
+    "/joomla/menu",
+    "/joomla/modules",
+    "/joomla/templates",
+    "/joomla/plugins",
+    "/opencart/api",
+    "/opencart/rest",
+    "/opencart/v1",
+    "/opencart/v2",
+    "/opencart/products",
+    "/opencart/categories",
+    "/opencart/customers",
+    "/opencart/orders",
+    "/opencart/coupons",
+    "/opencart/payments",
+    "/opencart/shipping",
+    "/opencart/stats",
+    "/prestashop/api",
+    "/prestashop/rest",
+    "/prestashop/v1",
+    "/prestashop/v2",
+    "/prestashop/products",
+    "/prestashop/customers",
+    "/prestashop/orders",
+    "/prestashop/cart",
+    "/prestashop/categories",
+    "/prestashop/manufacturers",
+    "/prestashop/stock",
+    "/prestashop/addresses",
+    "/prestashop/shipping",
+    "/prestashop/returns",
+    "/maltego/api",
+    "/maltego/rest",
+    "/maltego/v1",
+    "/maltego/v2",
+    "/maltego/transform",
+    "/maltego/graph",
+    "/maltego/entities",
+    "/maltego/settings",
+    "/auth",
+    "/auth/token",
+    "/auth/login",
+    "/auth/logout",
+    "/auth/refresh",
+    "/auth/validate",
+    "/oauth",
+    "/oauth2",
+    "/oauth/token",
+    "/oauth/authorize",
+    "/jwt",
+    "/jwt/token",
+    "/jwt/verify",
+    "/users",
+    "/users/v1",
+    "/users/v2",
+    "/users/me",
+    "/users/profile",
+    "/users/settings",
+    "/users/roles",
+    "/users/permissions",
+    "/users/notifications",
+    "/users/activity",
+    "/admin",
+    "/admin/api",
+    "/admin/settings",
+    "/admin/logs",
+    "/admin/analytics",
+    "/admin/monitoring",
+    "/admin/system",
+    "/admin/backup",
+    "/admin/reports",
+    "/orders",
+    "/orders/v1",
+    "/orders/v2",
+    "/orders/status",
+    "/orders/details",
+    "/orders/history",
+    "/orders/cancel",
+    "/orders/refund",
+    "/payments",
+    "/payments/v1",
+    "/payments/v2",
+    "/payments/gateway",
+    "/payments/stripe",
+    "/payments/paypal",
+    "/payments/bitcoin",
+    "/payments/transactions",
+    "/shop",
+    "/shop/api",
+    "/shop/products",
+    "/shop/cart",
+    "/shop/checkout",
+    "/shop/orders",
+    "/shop/customers",
+    "/shop/coupons",
+    "/shop/reviews",
+    "/shop/stock",
+    "/inventory",
+    "/inventory/stock",
+    "/inventory/products",
+    "/inventory/reports",
+    "/support",
+    "/support/tickets",
+    "/support/chat",
+    "/support/faq",
+    "/support/docs",
+    "/support/feedback",
+    "/blog",
+    "/blog/api",
+    "/blog/posts",
+    "/blog/categories",
+    "/blog/comments",
+    "/blog/tags",
+    "/blog/recent",
+    "/notifications",
+    "/notifications/list",
+    "/notifications/unread",
+    "/notifications/read",
+    "/notifications/settings",
+    "/settings",
+    "/settings/general",
+    "/settings/security",
+    "/settings/privacy",
+    "/settings/api-keys",
+    "/settings/integrations",
+    "/analytics",
+    "/analytics/v1",
+    "/analytics/v2",
+    "/analytics/traffic",
+    "/analytics/sales",
+    "/analytics/events",
+    "/analytics/reports",
+    "/reports",
+    "/reports/v1",
+    "/reports/v2",
+    "/reports/sales",
+    "/reports/users",
+    "/reports/security",
+    "/integrations",
+    "/integrations/list",
+    "/integrations/connect",
+    "/integrations/disconnect",
+    "/integrations/status",
+    "/integrations/settings",
+    "/cms",
+    "/cms/api",
+    "/cms/pages",
+    "/cms/blocks",
+    "/cms/media",
+    "/cms/settings",
+    "/wordpress",
+    "/wp-json/wp/v1/plugins",
+    "/wp-json/wp/v1/themes",
+    "/wp-json/wp/v1/users",
+    "/wp-json/wp/v1/media",
+    "/wp-json/wp/v1/settings",
+    "/magento",
+    "/magento/api",
+    "/magento/rest",
+    "/magento/v1",
+    "/magento/v2",
+    "/magento/products",
+    "/magento/customers",
+    "/magento/orders",
+    "/magento/cart",
+    "/magento/shipping",
+    "/magento/stock",
+    "/magento/pricing",
+    "/magento/coupons",
+    "/magento/returns",
+    "/drupal",
+    "/drupal/api",
+    "/drupal/v1",
+    "/drupal/v2",
+    "/drupal/content",
+    "/drupal/users",
+    "/drupal/comments",
+    "/drupal/taxonomy",
+    "/drupal/views",
+    "/drupal/files",
+    "/drupal/config",
+    "/drupal/cache",
+    "/drupal/performance",
+    "/drupal/modules",
+    "/typo3",
+    "/typo3/api",
+    "/typo3/rest",
+    "/typo3/v1",
+    "/typo3/v2",
+    "/typo3/pages",
+    "/typo3/content",
+    "/typo3/media",
+    "/typo3/settings",
+    "/typo3/extensions",
+    "/typo3/cache",
+    "/typo3/themes",
+    "/typo3/seo",
+    "/typo3/backup",
+    "/typo3/roles",
+    "/typo3/permissions",
+    "/api/random",
+    "/api/proxy",
+    "/api/ip",
+    "/api/geoip",
+    "/api/timezone",
+    "/api/qrcode",
+    "/api/barcode",
+    "/api/image",
+    "/api/video",
+    "/api/music",
+    "/api/stream",
+    "/api/gateway",
+    "/api/messages",
+    "/api/comments",
+    "/api/likes",
+    "/api/friends",
+    "/api/followers",
+    "/api/chat",
+    "/api/captcha",
+    "/api/cdn",
+    "/api/sync",
+    "/api/backup",
+    "/api/recovery",
+    "/api/security",
+    "/api/antifraud",
+    "/api/encryption",
+    "/api/blocklist",
+    "/api/allowlist",
+    "/api/spam",
+    "/api/logs",
+    "/api/dns",
+    "/api/network",
+    "/api/firewall"
+                ];
+
+                
+                function checkApiEndpoint($domain, $endpoint) {
+                    $url = $domain . $endpoint;
+                    $headers = @get_headers($url);
+                    if ($headers && strpos($headers[0], '200') !== false) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                
+                $domain = $_POST['api_domain'];
+echo "<h2 style='color: black;'>Поиск Api на {$domain}</h2>";
+
+                
+                $foundEndpoints = [];
+                foreach ($api_endpoints as $endpoint) {
+                    if (checkApiEndpoint($domain, $endpoint)) {
+                        $foundEndpoints[] = $endpoint;
+                    }
+                }
+
+                
+                if (!empty($foundEndpoints)) {
+                    foreach ($foundEndpoints as $endpoint) {
+                        echo "<p><strong>{$endpoint}</strong> &nbsp;| найдено </p>";
+                    }
+                } else {
+                    echo "<p> Ничего не найдено.</p>";
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+    
+    
+    
     <script>
         function copyToClipboard() {
             const resultsElement = document.getElementById('results');
@@ -735,7 +1073,13 @@ $subdomains = [
         });
     }
         
-        
+function copyApiResults() {
+        var results = document.getElementById('api_results').innerText;
+        navigator.clipboard.writeText(results).then(function() {
+        }, function(err) {
+            console.error('Не удалось скопировать текст: ', err);
+        });
+    } 
     </script>
 </body>
 </html>

@@ -218,43 +218,49 @@ $subdomains = [
     </div>
 
     
-    <div class="container">
-        <div class="card">
-            <h2 style="color:black;" >WaybackUrls Scan</h2>
-           
-            <form method="POST" action="">
-                <div class="form-group">
-                    <label style="color:black;" for="wayback_domain">Enter Domain:</label>
-                    <input type="text" id="wayback_domain" name="wayback_domain" placeholder="https://example.com" required>
-                </div>
-                <div class="buttons-container">
-                    <button type="submit" name="wayback_scan" class="wayback-button">Start Scan</button>
-                </div>
-            </form>
+<div class="container">
+    <div class="card">
+        <h2 style="color:black;">WaybackUrls Scan</h2>
+        
+        <form method="POST" action="">
+            <div class="form-group">
+                <label style="color:black;" for="wayback_domain">Enter Domain:</label>
+                <input type="text" id="wayback_domain" name="wayback_domain" placeholder="https://example.com" required>
+            </div>
+            <div class="buttons-container">
+                <button type="submit" name="wayback_scan" class="wayback-button">Start Scan</button>
+            </div>
+        </form>
+       
+        <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['wayback_scan'])): ?>
+            <div class="results" id="wayback_results">
+                <button class="copy-button" onclick="copyWaybackResults()">Copy to Clipboard</button>
+                <h2 style="color:black;">WaybackUrls Results:</h2>
+                <?php
+                function getWaybackUrls($domain) {
+                    $wayback_url = "https://web.archive.org/cdx/search/cdx?url={$domain}/*&output=json&fl=original&collapse=urlkey";
+                    $response = file_get_contents($wayback_url);
+                    $urls = json_decode($response, true);
+                    return $urls;
+                }
 
-           
-            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['wayback_scan'])): ?>
-                <div class="results" id="wayback_results">
-                    <button class="copy-button" onclick="copyWaybackResults()">Copy to Clipboard</button>
-                    <h2 style="color:black;" >WaybackUrls Results:</h2>
-                    <?php
-                    $wayback_domain = $_POST["wayback_domain"];
-                    try {
-                        
-                        $output = shell_exec("echo " . escapeshellarg($wayback_domain) . " | waybackurls | gf xss");
-                        if (!empty(trim($output))) {
-                            echo "<pre style='white-space: pre-wrap;'>" . htmlspecialchars($output) . "</pre>";
-                        } else {
-                            echo "<p>Ничего не найдено.</p>";
-                        }
-                    } catch (Exception $e) {
-                        
+                $wayback_domain = $_POST["wayback_domain"];
+                $wayback_urls = getWaybackUrls($wayback_domain);
+
+                if (!empty($wayback_urls)) {
+                    echo "<ul>";
+                    foreach ($wayback_urls as $url) {
+                        echo "<li><a href='" . htmlspecialchars($url[0]) . "' target='_blank'>" . htmlspecialchars($url[0]) . "</a></li>";
                     }
-                    ?>
-                </div>
-            <?php endif; ?>
-        </div>
+                    echo "</ul>";
+                } else {
+                    echo "<p>No URLs found.</p>";
+                }
+                ?>
+            </div>
+        <?php endif; ?>
     </div>
+</div>
     
     
     
@@ -1015,6 +1021,107 @@ echo "<h2 style='color: black;'>Поиск Api на {$domain}</h2>";
     
     
     
+    <div class="container">
+    <div class="card">
+        <h2 style="color:black;">SSL Certificate Check</h2>
+        
+        <form method="POST" action="">
+            <div class="form-group">
+                <label style="color:black;" for="ssl_domain">Enter Domain:</label>
+                <input type="text" id="ssl_domain" name="ssl_domain" placeholder="https://example.com" required>
+            </div>
+            <div class="buttons-container">
+                <button type="submit" name="ssl_check" class="ssl-button">Check SSL Certificate</button>
+            </div>
+        </form>
+       
+        <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ssl_check'])): ?>
+            <div class="results" id="ssl_results">
+                <button class="copy-button" onclick="copySslResults()">Copy to Clipboard</button>
+                <h2 style="color:black;">SSL Certificate Results:</h2>
+                <?php
+                function checkSslCertificate($domain) {
+                    $parsed_url = parse_url($domain);
+                    $host = $parsed_url['host'];
+                    $port = isset($parsed_url['port']) ? $parsed_url['port'] : 443;
+
+                    $context = stream_context_create([
+                        "ssl" => [
+                            "capture_peer_cert" => true,
+                        ],
+                    ]);
+
+                    $fp = @stream_socket_client("ssl://" . $host . ":" . $port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $context);
+
+                    if (!$fp) {
+                        return "Error: Unable to connect to the server.";
+                    }
+
+                    $cert = stream_context_get_params($fp)['options']['ssl']['peer_certificate'];
+                    fclose($fp);
+
+                    $cert_info = openssl_x509_parse($cert);
+                    return $cert_info;
+                }
+
+                $ssl_domain = $_POST["ssl_domain"];
+                $ssl_info = checkSslCertificate($ssl_domain);
+
+                if (is_array($ssl_info)) {
+                    echo "<pre>";
+                    print_r($ssl_info);
+                    echo "</pre>";
+                } else {
+                    echo "<p>" . htmlspecialchars($ssl_info) . "</p>";
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+    
+   
+   <div class="container">
+    <div class="card">
+        <h2 style="color:black;">WHOIS Scan</h2>
+        
+        <form method="POST" action="">
+            <div class="form-group">
+                <label style="color:black;" for="whois_domain">Enter Domain:</label>
+                <input type="text" id="whois_domain" name="whois_domain" placeholder="example.com" required>
+            </div>
+            <div class="buttons-container">
+                <button type="submit" name="whois_check" class="whois-button">Check WHOIS</button>
+            </div>
+        </form>
+       
+        <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['whois_check'])): ?>
+            <div class="results" id="whois_results">
+                <button class="copy-button" onclick="copyWhoisResults()">Copy to Clipboard</button>
+                <h2 style="color:black;">WHOIS Results:</h2>
+                <?php
+                function getWhoisInfo($domain) {
+                    $whois = shell_exec("whois {$domain}");
+                    return $whois;
+                }
+
+                $whois_domain = $_POST["whois_domain"];
+                $whois_info = getWhoisInfo($whois_domain);
+
+                if (!empty(trim($whois_info))) {
+                    echo "<pre>" . htmlspecialchars($whois_info) . "</pre>";
+                } else {
+                    echo "<p>No WHOIS information found.</p>";
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+   
+    
+    
     <script>
         function copyToClipboard() {
             const resultsElement = document.getElementById('results');
@@ -1038,16 +1145,13 @@ echo "<h2 style='color: black;'>Поиск Api на {$domain}</h2>";
             alert('WhatWeb results copied to clipboard!');
         }
 
-        function copyWaybackResults() {
-            const waybackResultsElement = document.getElementById('wayback_results');
-            const range = document.createRange();
-            range.selectNode(waybackResultsElement);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            alert('WaybackUrls results copied to clipboard!');
-        }
+   function copyWaybackResults() {
+        var results = document.getElementById('wayback_results').innerText;
+        navigator.clipboard.writeText(results).then(function() {
+        }, function(err) {
+            console.error('Не удалось скопировать текст: ', err);
+        });
+    }
         
             function copyDirectoryResults() {
         var results = document.getElementById('directory_results').innerText;
@@ -1080,6 +1184,24 @@ function copyApiResults() {
             console.error('Не удалось скопировать текст: ', err);
         });
     } 
+    
+        function copySslResults() {
+        var results = document.getElementById('ssl_results').innerText;
+        navigator.clipboard.writeText(results).then(function() {
+        }, function(err) {
+            console.error('Не удалось скопировать текст: ', err);
+        });
+    }
+    
+    
+        function copyWhoisResults() {
+        var results = document.getElementById('whois_results').innerText;
+        navigator.clipboard.writeText(results).then(function() {
+        }, function(err) {
+            console.error('Не удалось скопировать текст: ', err);
+        });
+    }
+    
     </script>
 </body>
 </html>

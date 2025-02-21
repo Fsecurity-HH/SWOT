@@ -1,7 +1,7 @@
 # SWOT 1.0
 Smart Website Osint Tool
 
-working only on Linux: 
+only works on Linux: 
 
 Kali
 Ubuntu
